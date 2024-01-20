@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jack's Math Problem Solver</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+
+    <!-- Add Math.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.6.0/math.js"></script>
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #111111;
+            color: #ffffff;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .container {
+            margin-top: 50px;
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .container:hover {
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            animation: textAnimation 3s infinite alternate;
+        }
+
+        @keyframes textAnimation {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        form {
+            margin-top: 20px;
+            animation: fadeInUp 1.5s;
+        }
+
+        label {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        textarea.form-control {
+            border-radius: 5px;
+            transition: border-color 0.3s ease-in-out;
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        textarea.form-control:focus {
+            border-color: #6e00ff;
+        }
+
+        button.btn-primary {
+            background: linear-gradient(45deg, #555555, #777777);
+            border: none;
+            transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+
+        button.btn-primary:hover {
+            background: linear-gradient(45deg, #777777, #999999);
+            color: #ffffff;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            animation: fadeIn 1.5s;
+        }
+
+        .correct {
+            color: #00ff3c;
+        }
+
+        .incorrect {
+            color: #ff0000;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 20px;
+            }
+        }
+
+        /* Website Mods Styles */
+        .website-mods {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1000;
+            background: linear-gradient(45deg, #555555, #777777);
+            border: none;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+        }
+
+        .website-mods:hover {
+            background: linear-gradient(45deg, #777777, #999999);
+            color: #ffffff;
+        }
+
+        .scroll-container {
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #1f1f1f;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+            display: none;
+            position: fixed;
+            right: 20px;
+            bottom: 70px;
+            z-index: 999;
+        }
+
+        .scroll-container:hover {
+            box-shadow: 0 8px 16px rgba(255, 255, 255, 0.2);
+        }
+
+        .option {
+            cursor: pointer;
+            color: #ffffff;
+            margin-bottom: 10px;
+            transition: color 0.3s ease-in-out;
+        }
+
+        /* Additional styles for fading out */
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Additional styles for larger text box */
+        .larger-textbox {
+            height: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jack's Math Problem Solver</h1>
+        <form method="post" action="/" onsubmit="return solveMathProblem()">
+            <div class="form-group">
+                <label for="user_input">Enter a math problem:</label>
+                <textarea class="form-control" name="user_input" id="user_input" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+            <button class="website-mods btn btn-primary btn-sm" onclick="toggleScrollContainer()">Website Mods</button>
+            <div class="scroll-container">
+                <div class="option" onclick="connectToMiacademy()">miacademy</div>
+            </div>
+        </form>
+
+        <div id="result-container"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function toggleScrollContainer() {
+            var scrollContainer = document.querySelector('.scroll-container');
+            scrollContainer.style.display = (scrollContainer.style.display === 'none' || scrollContainer.style.display === '') ? 'block' : 'none';
+
+            // Make the text box larger when the "miacademy" button is pressed
+            var userInput = document.querySelector('#user_input');
+            userInput.classList.toggle('larger-textbox');
+        }
+
+        function connectToMiacademy() {
+            var option = document.querySelector('.option');
+            var userInput = document.querySelector('#user_input').value;
+
+            // Replace division and multiplication symbols
+            userInput = userInput.replace(/÷/g, '/');
+            userInput = userInput.replace(/x/g, '*');
+
+            option.innerHTML = 'Connecting to server...';
+
+            // Simulate server connection delay
+            setTimeout(function () {
+                option.innerHTML = 'Connected';
+                // Add text animation here if needed
+                option.classList.add('fadeOut');
+
+                // Now, let's detect correct and incorrect answers
+                detectAnswers();
+            }, 2000);
+        }
+
+        function detectAnswers() {
+            var userInput = document.querySelector('#user_input').value;
+
+            // Extract question and answers
+            var parts = userInput.split('\n');
+            var question = parts[0].trim();
+            var answers = parts.slice(1).map(function(answer) {
+                return answer.trim();
+            });
+
+            try {
+                // Split the question into parts
+                var questionParts = question.split(' ÷ ');
+                var dividend = parseInt(questionParts[0]);
+                var divisor = parseInt(questionParts[1]);
+
+                // Calculate the correct answer and remainder
+                var correctResult = Math.floor(dividend / divisor);
+                var remainder = dividend % divisor;
+
+                // Display the result
+                var resultContainer = document.querySelector('#result-container');
+                resultContainer.innerHTML = '<div class="mt-4 result"><p>Math Problem Result: ' + correctResult + ' R ' + remainder + '</p></div>';
+
+                // Highlight correct and incorrect answers
+                highlightAnswers(correctResult, remainder, answers);
+            } catch (error) {
+                // Handle invalid math expressions
+                alert('Invalid math expression. Please check your input.');
+            }
+        }
+
+        function highlightAnswers(correctResult, remainder, answers) {
+            var resultContainer = document.querySelector('#result-container');
+
+            // Highlight correct answer in green
+            resultContainer.innerHTML += '<p class="correct">Correct Answer: ' + correctResult + ' R ' + remainder + '</p>';
+
+            // Highlight incorrect answers in red
+            resultContainer.innerHTML += '<p class="incorrect">Incorrect Answers:</p>';
+            answers.forEach(function(answer) {
+                var parts = answer.split(' R ');
+                var quotient = parseInt(parts[0]);
+                var currentRemainder = parseInt(parts[1]);
+
+                var isCorrect = (quotient === correctResult && currentRemainder === remainder);
+                var colorClass = isCorrect ? 'correct' : 'incorrect';
+                resultContainer.innerHTML += '<p class="' + colorClass + '">' + quotient + ' R ' + currentRemainder + '</p>';
+            });
+        }
+
+        function solveMathProblem() {
+            var userInput = document.querySelector('#user_input').value;
+
+            // Replace division and multiplication symbols
+            userInput = userInput.replace(/÷/g, '/');
+            userInput = userInput.replace(/x/g, '*');
+
+            try {
+                // Use Math.js to evaluate the math expression
+                var result = math.evaluate(userInput);
+
+                // Display the result
+                var resultContainer = document.querySelector('#result-container');
+                resultContainer.innerHTML = '<div class="mt-4 result"><p>Math Problem Result: ' + result + '</p></div>';
+
+                // Now, let's detect correct and incorrect answers when miacademy button is not pressed
+                if (userInput.includes('miacademy')) {
+                    detectAnswers();
+                }
+            } catch (error) {
+                // Handle invalid math expressions
+                alert('Invalid math expression. Please check your input.');
+            }
+
+            // Prevent the form from submitting
+            return false;
+        }
+    </script>
+</body>
+</html>
